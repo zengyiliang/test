@@ -1,0 +1,6 @@
+contractApply,合同报批申请
+branchOfficeCityManager_conventional,城市负责人审批
+headquartersInternalAudit_conventional,总部内审审批
+administrativeAudit_conventional,行政总监
+sealManagementSpecialistAudit_conventional,印章管理专员
+statisticalReviewSpecialistAudit_conventional,统计复核专员

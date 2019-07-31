@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.system.dao.SystemUserOperateRecordDao" >
+    <resultMap id="BaseResultMap" type="com.xhg.ops.system.model.SystemUserOperateRecord" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="operate_type" property="operateType" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="created_user_Id" property="createdUserId" jdbcType="INTEGER" />
+        <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+        <result column="enable" property="enable" jdbcType="BIT" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, user_id, operate_type, remark, created_user_Id, updated_user_id, created_time, updated_time, enable
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        where 1=1 and enable=1
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="operateType != null">
+                and operate_Type = #{operateType}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="createdUserId != null">
+                and created_user_id = #{createdUserId}
+            </if>
+            <if test="updatedUserId != null">
+                and updated_user_id = #{updatedUserId}
+            </if>
+
+        </trim>
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_ops_bu_system_user_operate_record
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_ops_bu_system_user_operate_record
+        where user_id = #{UserId,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="queryAllCount" resultType="java.lang.Integer" parameterType="com.xhg.ops.system.model.SystemUserOperateRecord">
+        select COUNT(1)
+        from t_ops_bu_system_user_operate_record <include refid="Where_Clause"/>
+    </select>
+
+
+    <select id="queryAllList" resultMap="BaseResultMap" parameterType="com.xhg.ops.system.model.SystemUserOperateRecord">
+        select <include refid="Base_Column_List"/>
+        from t_ops_bu_system_user_operate_record <include refid="Where_Clause"/>
+    </select>
+
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+        update t_ops_bu_system_user_operate_record set enable=0
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insert" parameterType="com.xhg.ops.system.model.SystemUserOperateRecord" >
+        insert into t_ops_bu_system_user_operate_record (id, user_id, operate_type,remark,
+         created_user_Id, updated_user_id,created_time, updated_time, enable
+        )
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{operateType,jdbcType=INTEGER},
+        #{remark,jdbcType=VARCHAR}, #{createdUserId,jdbcType=INTEGER}, #{updatedUserId,jdbcType=INTEGER},
+        #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, #{enable,jdbcType=BIT}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.xhg.ops.system.model.SystemUserOperateRecord" >
+        insert into t_ops_bu_system_user_operate_record
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="operateType != null" >
+                operate_type,
+            </if>
+            <if test="remark != null and remark !=''" >
+                remark,
+            </if>
+            <if test="createdUserId != null" >
+                created_user_Id,
+            </if>
+            <if test="updatedUserId != null" >
+                updated_user_id,
+            </if>
+            <if test="createdTime != null" >
+                created_time,
+            </if>
+            <if test="updatedTime != null" >
+                updated_time,
+            </if>
+            <if test="enable != null" >
+                enable,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="operateType != null" >
+                #{operateType,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark !=''" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createdUserId != null" >
+                #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="updatedUserId != null" >
+                #{updatedUserId,jdbcType=INTEGER},
+            </if>
+            <if test="createdTime != null" >
+                #{createdTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedTime != null" >
+                #{updatedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enable != null" >
+                #{enable,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.xhg.ops.system.model.SystemUserOperateRecord" >
+        update t_ops_bu_system_user_operate_record
+        <set>
+            <if test="userNo != null" >
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="operateType != null" >
+                operate_Type = #{operateType,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createdUserId != null" >
+                created_user_Id = #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="updatedUserId != null" >
+                updated_user_id = #{updatedUserId,jdbcType=INTEGER},
+            </if>
+            <if test="createdTime != null" >
+                created_time = #{createdTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedTime != null" >
+                updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enable != null" >
+                enable = #{enable,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xhg.ops.system.model.SystemUserOperateRecord" >
+        update t_ops_bu_system_user_operate_record
+        set
+        user_id = #{userId,jdbcType=INTEGER},
+        operate_type = #{operateType,jdbcType=INTEGER},
+        remark = #{remark,jdbcType=VARCHAR},
+        created_user_Id = #{createdUserId,jdbcType=INTEGER},
+        updated_user_id = #{updatedUserId,jdbcType=INTEGER},
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+        enable = #{enable,jdbcType=BIT}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

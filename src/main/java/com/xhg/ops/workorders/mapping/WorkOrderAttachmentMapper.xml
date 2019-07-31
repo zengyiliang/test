@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderAttachmentDao" >
+  <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrderAttachment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="buesiness_id" property="buesinessId" jdbcType="INTEGER" />
+    <result column="business_type" property="businessType" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+  </resultMap>
+  
+  <!-- 查询业务附件信息 -->
+  <select id="queryAttachmentList" resultType="java.lang.String" parameterType="java.lang.Integer" >
+    SELECT
+    	url
+    FROM t_ops_bu_work_order_attachment
+    WHERE enable = 1 AND buesiness_id = #{business_id} AND business_type = #{business_type}
+    ORDER BY id;
+  </select>
+  
+  <!-- 批量插入 -->
+  <insert id="insertBatchAttachment" parameterType="com.xhg.ops.workorders.model.WorkOrderAttachment" >
+    INSERT INTO t_ops_bu_work_order_attachment (
+		buesiness_id,
+		business_type,
+		url,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+    ) VALUES 
+    <foreach collection="list" item="item" index="index" separator="," >  
+        (
+	        #{item.buesinessId,jdbcType=INTEGER},
+	    	#{item.businessType,jdbcType=INTEGER},
+	        #{item.url,jdbcType=VARCHAR},
+	        #{item.createdUserId,jdbcType=INTEGER},
+	        #{item.updatedUserId,jdbcType=INTEGER},
+	        #{item.createdTime,jdbcType=TIMESTAMP},
+	        #{item.updatedTime,jdbcType=TIMESTAMP},
+	        #{item.enable,jdbcType=BIT}
+        )  
+    </foreach>  
+  </insert>
+  
+  <!-- 更新附件信息无效 -->
+  <delete id="deletebBatchAttachment" parameterType="java.lang.Integer" >
+    DELETE FROM t_ops_bu_work_order_attachment  WHERE buesiness_id = {buesiness_id} AND business_type = #{business_type}
+  </delete>
+</mapper>

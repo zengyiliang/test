@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xhg.ops.system.dao.CyclingAreaDao">
+	<!-- Result Map -->
+	<resultMap id="BaseResultMap" type="com.xhg.ops.system.model.CyclingAreaDO">
+		<result column="id" property="id" />
+		<result column="area_code" property="areaCode" />
+		<result column="area_name" property="areaName" />
+		<result column="parent_id" property="parentId" />
+		<result column="node_level" property="nodeLevel" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,area_code,area_name,parent_id,node_level
+	</sql>
+
+	<sql id="Base_Column_List_C">
+		c.id,c.area_code,c.area_name,c.parent_id,c.node_level
+	</sql>
+
+	<!-- 查询条件 -->
+	<sql id="Where_Clause">
+		where 1=1
+		<trim suffixOverrides=",">
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="areaCode != null and areaCode != ''">
+				and area_code = #{areaCode}
+			</if>
+			<if test="areaName != null and areaName != ''">
+				and area_name = #{areaName}
+			</if>
+			<if test="parentId != null ">
+				and parent_id = #{parentId}
+			</if>
+			<if test="nodeLevel != null ">
+				and node_level = #{nodeLevel}
+			</if>
+		</trim>
+	</sql>
+
+
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.xhg.ops.system.model.CyclingAreaDO"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		t_cycling_db_area(area_code,area_name,parent_id,node_level)
+		values(#{areaCode},#{areaName},#{parentId},#{nodeLevel})
+	</insert>
+
+	<insert id="insertSelective" parameterType="com.xhg.ops.system.model.CyclingAreaDO" useGeneratedKeys="true" keyProperty="id">
+		insert into t_cycling_db_area
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="areaCode != null and areaCode != ''" >
+				area_code,
+			</if>
+			<if test="areaName != null and areaName != ''">
+				area_name,
+			</if>
+			<if test="parentId != null">
+				parent_id,
+			</if>
+			<if test="nodeLevel != null">
+				node_level,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="areaCode != null and areaCode != ''" >
+				#{area_code,jdbcType=VARCHAR},
+			</if>
+
+			<if test="areaName != null and areaName != ''">
+				#{area_name,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				#{parent_id,jdbcType=INTEGER},
+			</if>
+			<if test="nodeLevel != null">
+				#{node_level,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.xhg.ops.system.model.CyclingAreaDO">
+		update t_cycling_db_area set
+		area_code=#{areaCode},area_name=#{areaName},parent_id=#{parentId},node_level=#{nodeLevel}
+		where id=#{id}
+	</update>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="updateBySelective" parameterType="com.xhg.ops.system.model.CyclingAreaDO">
+		update t_cycling_db_area set
+		<trim suffixOverrides=",">
+			<if test="areaCode != null  and areaCode != ''">
+				area_code=#{areaCode},
+			</if>
+			<if test="areaName != null  and areaName != ''">
+				area_name=#{areaName},
+			</if>
+			<if test="parentId != null  ">
+				parent_id=#{parentId},
+			</if>
+			<if test="nodeLevel != null  ">
+				node_level=#{nodeLevel},
+			</if>
+		</trim>
+		where id=#{id}
+	</update>
+
+	<!-- 删除记录 -->
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from t_cycling_db_area where id = #{id}
+	</delete>
+
+	<!-- 根据id查询 ${codeName} -->
+	<select id="queryById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select <include refid="Base_Column_List" />
+		from t_cycling_db_area where id = #{id}
+	</select>
+
+	<!-- ${codeName} 列表总数 -->
+	<select id="queryAllCount" resultType="java.lang.Integer" parameterType="com.xhg.ops.system.model.CyclingAreaDO">
+		select count(1) from t_cycling_db_area
+		<include refid="Where_Clause" />
+	</select>
+
+	<!-- 查询${codeName}列表 -->
+	<select id="queryAllList" resultMap="BaseResultMap" parameterType="com.xhg.ops.system.model.CyclingAreaDO">
+		select <include refid="Base_Column_List" />
+		from t_cycling_db_area
+		<include refid="Where_Clause" />
+	</select>
+
+	<!-- 查询${codeName}列表 -->
+	<select id="queryAllListInfo" resultMap="BaseResultMap" parameterType="com.xhg.ops.system.model.CyclingAreaDO">
+		SELECT id,area_code,area_name FROM t_cycling_db_area WHERE parent_id=#{parentId} AND node_level=#{nodeLevel}
+	</select>
+
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from t_cycling_db_area  where id in
+		<foreach collection="list" item="cyclingAreaId" index="index"
+			open="(" close=")" separator=",">
+			#{cyclingAreaId}
+		</foreach>
+	</delete>
+
+	<insert id="insertByBatch" parameterType="java.util.List">
+		insert into t_cycling_db_area(area_code,area_name,parent_id,node_level)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.areaCode},#{item.areaName},#{item.parentId},#{item.nodeLevel})
+		</foreach>
+	</insert>
+	
+	<!-- 根据id查询 ${codeName} -->
+	<select id="queryByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select <include refid="Base_Column_List" />
+		from t_cycling_db_area where area_code = #{areaCode}
+	</select>
+
+	<!-- 根据区域编码查询城市和区县信息 -->
+	<select id="queryCityAreaInfo" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+			a1.area_code as city_code,
+			a1.area_name as city_name,
+			a2.area_name,
+			a2.area_code
+		from
+			t_cycling_db_area a1,
+			t_cycling_db_area a2
+		where
+			a1.id = a2.parent_id
+			and a2.area_code = #{areaCode}
+	</select>
+
+	<select id="queryNameByCode" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		SELECT id,area_code,area_name,node_level,t1.parent_id as parent_id
+		FROM (
+		SELECT
+		@r AS _id,
+		(SELECT @r := parent_id FROM t_cycling_db_area WHERE id = _id) AS parent_id,
+		@l := @l - 1 AS lvl
+		FROM
+		(SELECT @r :=id, @l := (node_level+1) from t_cycling_db_area where
+		area_code=#{code}) vars,
+		t_cycling_db_area h
+		WHERE @r != 0
+		)T1
+		JOIN t_cycling_db_area T2
+		ON T1._id = T2.id
+		ORDER BY id;
+	</select>
+
+	<select id="queryAllByParentId" resultType="com.xhg.ops.system.vo.areazone.SystemAreaListVO"
+			parameterType="java.lang.String">
+		SELECT area_code areaCode,area_name areaName
+		FROM t_cycling_db_area WHERE parent_id=(SELECT id FROM t_cycling_db_area WHERE  area_code=#{code})
+	</select>
+
+
+	<select id="queryAreaCodeListByParent" resultType="java.lang.String"
+		parameterType="java.lang.String">
+		select b.area_code from t_cycling_db_area a left join t_cycling_db_area b on
+		a.id=b.parent_id
+		where a.area_code=#{code}
+	</select>
+
+	<!-- add by wanglijuan 查询${codeName}列表 -->
+	<select id="queryListByParam" resultMap="BaseResultMap"
+		parameterType="com.xhg.ops.system.model.CyclingAreaDO">
+		select
+		<include refid="Base_Column_List" />
+		from t_cycling_db_area
+		<include refid="Where_Clause" />
+	</select>
+	
+	
+	<select id="queryListByAreaCodeList" resultMap="BaseResultMap" parameterType="java.util.List">
+		select
+		<include refid="Base_Column_List" />
+		from t_cycling_db_area
+		where node_level=1 and area_code in
+		<foreach collection="list" item="areaCode" index="index"
+			open="(" close=")" separator=",">
+			#{areaCode}
+		</foreach>
+	</select>
+	
+	<!-- 根据区县code编码查询市级城市名-->
+	<select id="queryCityByCode" parameterType="string" resultMap="BaseResultMap">
+		select
+			a1.area_code,
+			a1.area_name
+		from
+			t_cycling_db_area a1,
+			t_cycling_db_area a2
+		where
+			a1.id = a2.parent_id
+			and a2.area_code = #{areaCode}
+	</select>
+
+</mapper>   

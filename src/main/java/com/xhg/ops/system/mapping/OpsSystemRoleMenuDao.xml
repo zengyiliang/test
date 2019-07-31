@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xhg.ops.system.dao.OpsSystemRoleMenuDao">
+	<!-- 查询所有角色对应的菜单放到缓存里面 -->
+	<select id="queryByRoleMenuList" resultType="com.xhg.ops.system.entity.OpsSystemRoleMenuDO">
+		SELECT
+		rm.id,
+		rm.menu_id menuId,
+		rm.role_Id roleId,
+		r.role_code roleCode,
+		r.NAME
+		roleName,
+		m.url url,
+		m.`name` meunName,
+		m.`code` meunCode,
+		m.parent_id
+		parentId,
+		m.permission permission,
+		m.type type
+		FROM
+		`t_ops_bu_system_role_menu` rm
+		LEFT JOIN t_ops_bu_system_role r ON r.id
+		= rm.role_Id
+		LEFT JOIN t_ops_bu_system_menu m ON m.id = rm.menu_id
+		WHERE
+		rm.`enable` = 1
+		AND r.`enable` = 1
+		AND m.`enable` =1
+		<if test="list.size() > 0">
+			and rm.role_id IN
+			<foreach collection="list" item="item" index="index"
+				separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+
+
+	<!-- 根据id查询 ${codeName} -->
+	<select id="queryByRoleId" resultType="com.xhg.ops.system.entity.OpsSystemRoleMenuDO"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_role_menu
+		where role_Id=#{roleId} and enable=1
+	</select>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="updateByRoleMenu"> 
+		update t_ops_bu_system_role_menu set
+
+		enable=0
+
+		where role_Id=#{roleId} and menu_id not in (
+
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			#{item}
+		</foreach>
+		)
+	</update>
+	
+	<!-- 查询修改list中存在的数据 -->
+	<select id="queryByListExist" resultType="java.lang.Integer"
+		>
+		select
+		menu_id menuId
+		from t_ops_bu_system_role_menu
+		where role_Id=#{roleId} and menu_id  in (
+
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			#{item}
+		</foreach>
+		) and  enable=1
+	</select>
+</mapper>   

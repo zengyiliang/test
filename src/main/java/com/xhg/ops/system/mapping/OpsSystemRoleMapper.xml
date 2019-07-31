@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xhg.ops.system.dao.OpsSystemRoleDao">
+	<!-- Result Map -->
+	<resultMap id="BaseResultMap" type="com.xhg.ops.system.entity.OpsSystemRoleDO">
+		<result column="id" property="id" />
+		<result column="role_code" property="roleCode" />
+		<result column="name" property="name" />
+		<result column="created_user_Id" property="createdUserId" />
+		<result column="updated_user_id" property="updatedUserId" />
+		<result column="created_time" property="createdTime" />
+		<result column="updated_time" property="updatedTime" />
+		<result column="enable" property="enable" />
+	</resultMap>
+
+	<!-- t_ops_bu_system_role table all fields -->
+	<sql id="Base_Column_List">
+		id, role_code, name, created_user_Id, updated_user_id, created_time, updated_time, enable
+	</sql>
+
+	<!-- 查询条件 -->
+	<sql id="Where_Clause">
+		<where> 
+		enable=1
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="roleCode != null and roleCode != ''">
+				and role_code = #{roleCode}
+			</if>
+			<if test="name != null and name != ''">
+				and name = #{name}
+			</if>
+			<if test="createdUserId != null">
+				and created_user_Id = #{createdUserId}
+			</if>
+			<if test="updatedUserId != null">
+				and updated_user_id = #{updatedUserId}
+			</if>
+			<if test="createdTime != null">
+				and created_time = #{createdTime}
+			</if>
+			<if test="updatedTime != null">
+				and updated_time = #{updatedTime}
+			</if>
+			<if test="enable != null">
+				and enable = #{enable}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="com.xhg.ops.system.entity.OpsSystemRoleDO" useGeneratedKeys="true" keyProperty="id">
+		insert into t_ops_bu_system_role
+			(role_code, name, created_user_Id, updated_user_id, created_time, updated_time, enable)
+		values
+			(#{roleCode},#{name},#{createdUserId},#{updatedUserId},#{createdTime},#{updatedTime},#{enable})
+	</insert>
+
+	<!-- 根据id，修改记录 -->
+	<update id="update" parameterType="com.xhg.ops.system.entity.OpsSystemRoleDO">
+		update t_ops_bu_system_role
+		<set>
+			role_code=#{roleCode},
+			name=#{name},
+			created_user_Id=#{createdUserId},
+			updated_user_id=#{updatedUserId},
+			created_time=#{createdTime},
+			updated_time=#{updatedTime},
+			enable=#{enable}
+		</set> 
+		where id=#{id}
+	</update>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="updateBySelective" parameterType="com.xhg.ops.system.entity.OpsSystemRoleDO">
+		update t_ops_bu_system_role 
+		<set>
+			<if test="roleCode != null and roleCode != ''">
+				role_code=#{roleCode},
+			</if>
+			<if test="name != null and name != ''">
+				name=#{name},
+			</if>
+			<if test="createdUserId != null">
+				created_user_Id=#{createdUserId},
+			</if>
+			<if test="updatedUserId != null">
+				updated_user_id=#{updatedUserId},
+			</if>
+			<if test="createdTime != null">
+				created_time=#{createdTime},
+			</if>
+			<if test="updatedTime != null">
+				updated_time=#{updatedTime},
+			</if>
+			<if test="enable != null">
+				enable=#{enable},
+			</if>
+		</set> 
+		where id=#{id}
+	</update>
+
+	<!-- 删除记录 -->
+	<delete id="delete" parameterType="java.lang.Integer">
+		update t_ops_bu_system_role set enable=0 where id = #{id}
+	</delete>
+
+	<!-- 根据id查询 ${codeName} -->
+	<select id="queryById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select <include refid="Base_Column_List" />
+		from t_ops_bu_system_role
+		where id=#{id} and enable=1
+	</select>
+
+	<!-- ${codeName} 列表总数 -->
+	<select id="queryAllCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(1) from t_ops_bu_system_role
+		<include refid="Where_Clause" />
+	</select>
+
+	<!-- 查询${codeName}列表 -->
+	<select id="queryAllList" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_role
+		<include refid="Where_Clause" />
+	</select>
+
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		update t_ops_bu_system_role
+		set enable=0 
+		where id in 
+		<foreach collection="list" item="opsSystemRoleId" index="index" open="(" close=")" separator=",">
+			#{opsSystemRoleId}
+		</foreach>
+	</delete>
+
+	<insert id="insertByBatch" keyProperty="id" useGeneratedKeys="true" parameterType="java.util.List">
+		insert into t_ops_bu_system_role
+			(role_code, name, created_user_Id, updated_user_id, created_time, updated_time, enable)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.roleCode}, #{item.name}, #{item.createdUserId}, #{item.updatedUserId}, #{item.createdTime}, #{item.updatedTime}, #{item.enable})
+		</foreach>
+	</insert>
+
+</mapper>   

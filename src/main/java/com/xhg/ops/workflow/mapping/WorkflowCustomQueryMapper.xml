@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workflow.dao.WorkflowCustomQueryDao">
+
+    <sql id="processUndoByCandidateUserIncludeBKSql">
+        ACT_RU_TASK RES
+        LEFT JOIN ACT_RU_IDENTITYLINK I
+          ON I.TASK_ID_ = RES.ID_
+        INNER JOIN ACT_RE_PROCDEF D
+          ON RES.PROC_DEF_ID_ = D.ID_
+        LEFT JOIN act_ru_execution ex
+          ON RES.PROC_INST_ID_=ex.PROC_INST_ID_
+        WHERE
+        1=1
+        <if test="null != processDefineKey and processDefineKey !='' ">
+            D.KEY_ = #{processDefineKey}
+        </if>
+
+        AND (
+            1=0 OR
+
+            <if test="null != userId and userId !='' ">
+                RES.ASSIGNEE_ = #{userId}
+            </if>
+
+              OR
+              (
+                RES.ASSIGNEE_ IS NULL AND I.TYPE_ = 'candidate' AND
+                (
+                    <if test="null != userId and userId !='' ">
+                        I.USER_ID_ = #{userId}
+                    </if>
+
+                    <if test="null != roleCodeList and roleCodeList.size > 0">
+                        OR I.GROUP_ID_ IN
+                        <foreach collection="roleCodeList" item="roleId" open="(" separator=", "  close=")">
+                            #{roleId}
+                        </foreach>
+                    </if>
+                )
+              )
+            )
+        AND ex.BUSINESS_KEY_ IS NOT NULL
+    </sql>
+
+    <select id="countProcessUndoByCandidateUserIncludeBK" resultType="long" parameterType="com.xhg.ops.workflow.dto.WorkflowQueryReq">
+        SELECT count(1) FROM
+        <include refid="processUndoByCandidateUserIncludeBKSql"/>
+    </select>
+
+
+    <select id="listProcessUndoByCandidateUserIncludeBK" resultType="com.xhg.ops.workflow.dto.WorkflowQueryResp" parameterType="com.xhg.ops.workflow.dto.WorkflowQueryReq">
+        SELECT
+            RES.DESCRIPTION_ taskDoc,
+            RES.id_ taskId,
+            RES.ASSIGNEE_ userId,
+            RES.CREATE_TIME_ createTime,
+            RES.NAME_ NAME,
+            RES.PROC_INST_ID_ processInstanceId,
+            ex.BUSINESS_KEY_ businessKey
+        FROM
+        <include refid="processUndoByCandidateUserIncludeBKSql"/>
+        limit #{startIndex},#{pageSize}
+    </select>
+
+
+    <sql id="queryProcessedForUserSql">
+         act_hi_actinst hiAct
+        LEFT JOIN act_re_procdef reProcdef
+        ON hiAct.`PROC_DEF_ID_` = reProcdef.`ID_`
+        WHERE
+            1=1
+            <if test="null != userId and userId !='' ">
+                AND hiAct.`ASSIGNEE_` = #{userId}
+            </if>
+            AND hiAct.`END_TIME_` IS NOT NULL
+            <if test="null != processDefineKey and processDefineKey !='' ">
+                AND reProcdef.`KEY_` = #{processDefineKey}
+            </if>
+        ORDER BY hiAct.`END_TIME_` DESC
+    </sql>
+
+    <select id="queryProcessedForUser" resultType="com.xhg.ops.workflow.dto.WorkflowQueryResp" parameterType="com.xhg.ops.workflow.dto.WorkflowQueryReq">
+        SELECT
+            reProcdef.`KEY_` businessKey,
+            hiAct.`PROC_INST_ID_` processInstanceId,
+            hiAct.`END_TIME_` endTime,
+            hiAct.`ASSIGNEE_` userId,
+            hiAct.`ACT_NAME_` NAME
+        FROM
+        <include refid="queryProcessedForUserSql"/>
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <select id="countProcessedForUser" resultType="long" parameterType="com.xhg.ops.workflow.dto.WorkflowQueryReq">
+        SELECT count(1) FROM
+        <include refid="queryProcessedForUserSql"/>
+    </select>
+
+</mapper>

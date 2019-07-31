@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderDao">
+	<resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrder">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="order_type" property="orderType" jdbcType="INTEGER" />
+		<result column="order_title" property="orderTitle" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="data_source" property="dataSource" jdbcType="INTEGER" />
+		<result column="level" property="level" jdbcType="INTEGER" />
+		<result column="contact_info" property="contactInfo" jdbcType="VARCHAR" />
+		<result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+		<result column="site_code" property="siteCode" jdbcType="VARCHAR" />
+		<result column="site_area_code" property="siteAreaCode"	jdbcType="VARCHAR" />
+		<result column="site_longitude" property="siteLongitude" jdbcType="VARCHAR" />
+		<result column="site_latitude" property="siteLatitude" jdbcType="VARCHAR" />
+		<result column="site_address" property="siteAddress" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="proc_inst_id" property="procInstId"	jdbcType="VARCHAR" />
+		<result column="proc_user_id" property="procUserId"	jdbcType="INTEGER" />
+		<result column="proc_task_id" property="procTaskId"	jdbcType="VARCHAR" />
+		<result column="fault_id" property="orderType" jdbcType="INTEGER" />
+		<result column="created_user" property="createdUser" jdbcType="VARCHAR" />
+		<result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+		<result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+		<result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+		<result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+		<result column="enable" property="faultId" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<!-- 查询单个 -->
+	<select id="queryOne" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		SELECT
+			id,
+			order_no, 
+			order_type, 
+			order_title,
+			status,
+			data_source, 
+			level,
+			contact_info,
+			device_id,
+			site_code, 
+			site_area_code, 
+			site_longitude,
+			site_latitude, 
+			site_address, 
+			remark,
+			proc_inst_id,
+			proc_user_id,
+			proc_task_id,
+			fault_id,
+			created_user, 
+			created_time, updated_time, created_user_id, updated_user_id
+		FROM t_ops_bu_work_order
+		where enable = 1 AND id = #{id}
+	</select>
+	
+	<!-- 根据参数查询工单列表 -->
+	<select id="queryWorkOrderList" resultType="com.xhg.ops.workorders.dto.WorkOrderFindResultDto" parameterType="java.util.Map">
+		SELECT
+			id,
+			order_no orderNo, 
+			order_type orderType, 
+			order_title orderTitle,
+			status,
+			data_source dataSource, 
+			level,
+			remark,
+			proc_inst_id procInstId,
+			proc_task_id procTaskId,
+			created_user createdUser, 
+			created_time createdTime,
+			created_user_id createdUserId,
+			updated_time updatedTime
+		FROM t_ops_bu_work_order
+		<where>
+			enable = 1
+			<if test="orderNo != null and orderNO != ''">
+				AND order_no = #{orderNo}
+			</if>
+			<if test="createdUser != null and createdUser != ''">
+				AND created_user = #{createdUser}
+			</if>
+			<if test="orderType != null and orderType != ''">
+				AND order_type = #{orderType}
+			</if>
+			<if test="status != null">
+				AND status = #{status}
+			</if>
+			<if test="procInstIdList != null and procInstIdList.size() > 0">
+				AND proc_inst_id IN
+				<foreach collection="procInstIdList" item="item" index="index" separator="," open="(" close=")">
+					#{item}
+				</foreach>  
+			</if>
+		</where>
+		ORDER BY updated_time DESC
+	</select>
+	
+	<!-- 获取当天最大工单数 -->
+	<select id="selectOrderMaxOrderNo" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT MAX(order_no) FROM t_ops_bu_work_order WHERE order_no LIKE concat(#{orderNoPrefix}, '%')
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterType="com.xhg.ops.workorders.model.WorkOrder" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_ops_bu_work_order (
+			order_no,
+			order_type,
+			order_title, 
+			status,
+			data_source, 
+			level,
+			contact_info, 
+			device_id,
+			site_code,
+			site_area_code, 
+			site_longitude, 
+			site_latitude,
+			site_address,
+			remark, 
+			proc_inst_id,
+			proc_user_id, 
+			proc_task_id,
+			fault_id,
+			created_user, 
+			created_time,
+			updated_time, 
+			created_user_id, 
+			updated_user_id,
+			enable
+		) VALUES (
+			UUID_SHORT(),
+			#{orderType,jdbcType=INTEGER},
+			#{orderTitle,jdbcType=VARCHAR},
+			#{status,jdbcType=INTEGER},
+			#{dataSource,jdbcType=INTEGER}, 
+			#{level,jdbcType=INTEGER},
+			#{contactInfo,jdbcType=VARCHAR}, 
+			#{deviceId,jdbcType=VARCHAR},
+			#{siteCode,jdbcType=VARCHAR},
+			#{siteAreaCode,jdbcType=VARCHAR},
+			#{siteLongitude,jdbcType=VARCHAR}, 
+			#{siteLatitude,jdbcType=VARCHAR},
+			#{siteAddress,jdbcType=VARCHAR}, 
+			#{remark,jdbcType=VARCHAR},
+			#{procInstId,jdbcType=VARCHAR},
+			#{procUserId,jdbcType=INTEGER},
+			#{procTaskId,jdbcType=VARCHAR},
+			#{faultId,jdbcType=INTEGER},
+			#{createdUser,jdbcType=VARCHAR}, 
+			#{createdTime,jdbcType=TIMESTAMP},
+			#{updatedTime,jdbcType=TIMESTAMP}, 
+			#{createdUserId,jdbcType=INTEGER},
+			#{updatedUserId,jdbcType=INTEGER},
+			#{enable,jdbcType=BIT}
+		)
+	</insert>
+	
+	<!-- 更新订单信息 -->
+	<update id="updateWorkOrder" parameterType="java.util.Map">
+		UPDATE t_ops_bu_work_order
+		<set>
+			updated_time = #{updatedTime},
+			<if test="orderNo != null and orderNo != ''">
+				order_no = #{orderNo},
+			</if>
+			<if test="status != null and status != 0">
+				status = #{status},
+			</if>
+			<if test="level != null and level != 0">
+				level = #{level},
+			</if>
+			<if test="procInstId != null and procInstId != ''">
+				proc_inst_id = #{procInstId},
+			</if>
+			<if test="procUserId != null and procUserId != 0">
+				proc_user_id = #{procUserId},
+			</if>
+			<if test="procTaskId != null and procTaskId != ''">
+				proc_task_id = #{procTaskId},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+			<if test="updatedUserId != null and updatedUserId != 0">
+				updated_user_id = #{updatedUserId},
+			</if>
+		</set>
+		<where>
+			id = #{id}
+			<if test="neStatus != null">
+				AND status != #{neStatus}
+			</if>
+		</where>
+	</update>
+	
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderLogDao" >
+  <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrderLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="created_user" property="createdUser" jdbcType="VARCHAR" />
+    <result column="created_user_desc" property="createdUserDesc" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+  </resultMap>
+  
+  <select id="queryWorkOrderLogList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    SELECT 
+    	id,
+    	order_id,
+    	order_status,
+    	remark,
+    	created_user,
+    	created_user_desc,
+    	created_time, 
+    	updated_time,
+    	created_user_id,
+    	updated_user_id
+    FROM t_ops_bu_work_order_log
+    WHERE order_id = #{orderId} ORDER BY created_time DESC
+  </select>
+  
+  <!-- 新增日志 -->
+  <insert id="insert" parameterType="com.xhg.ops.workorders.model.WorkOrderLog" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO t_ops_bu_work_order_log (
+    	order_id,
+    	order_status,
+    	remark,
+    	created_user,
+    	created_user_desc,
+    	created_time,
+    	updated_time,
+    	created_user_id, 
+        updated_user_id,
+        enable
+    ) VALUES (
+    	#{orderId,jdbcType=INTEGER},
+    	#{orderStatus,jdbcType=INTEGER},
+        #{remark,jdbcType=VARCHAR},
+        #{createdUser,jdbcType=VARCHAR},
+        #{createdUserDesc,jdbcType=VARCHAR}, 
+        #{createdTime,jdbcType=TIMESTAMP},
+        #{updatedTime,jdbcType=TIMESTAMP},
+        #{createdUserId,jdbcType=INTEGER}, 
+        #{updatedUserId,jdbcType=INTEGER},
+        #{enable,jdbcType=BIT}
+    )
+  </insert>
+    
+</mapper>

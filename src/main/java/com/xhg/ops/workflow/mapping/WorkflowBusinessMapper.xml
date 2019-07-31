@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workflow.dao.WorkflowBusinessDao">
+    <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrder">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="order_type" property="orderType" jdbcType="INTEGER" />
+        <result column="order_title" property="orderTitle" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="data_source" property="dataSource" jdbcType="INTEGER" />
+        <result column="level" property="level" jdbcType="INTEGER" />
+        <result column="contact_info" property="contactInfo" jdbcType="VARCHAR" />
+        <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+        <result column="site_code" property="siteCode" jdbcType="VARCHAR" />
+        <result column="site_area_code" property="siteAreaCode"	jdbcType="VARCHAR" />
+        <result column="site_longitude" property="siteLongitude" jdbcType="VARCHAR" />
+        <result column="site_latitude" property="siteLatitude" jdbcType="VARCHAR" />
+        <result column="site_address" property="siteAddress" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="proc_inst_id" property="procInstId"	jdbcType="VARCHAR" />
+        <result column="proc_user_id" property="procUserId"	jdbcType="INTEGER" />
+        <result column="created_user" property="createdUser" jdbcType="VARCHAR" />
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+        <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+        <result column="enable" property="enable" jdbcType="BIT" />
+    </resultMap>
+
+    <!--
+    <sql id="WorkOrderProcessedSql">
+        (
+            SELECT DISTINCT RES.* , DEF.KEY_ AS PROC_DEF_KEY_, DEF.NAME_ AS PROC_DEF_NAME_, DEF.VERSION_ AS PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ AS DEPLOYMENT_ID_
+            FROM ACT_HI_PROCINST RES LEFT OUTER JOIN ACT_RE_PROCDEF DEF ON RES.PROC_DEF_ID_ = DEF.ID_ WHERE DEF.KEY_ = #{processDefineKey} AND RES.END_TIME_ IS NOT NULL AND
+            (
+                EXISTS
+                (
+                    SELECT LINK.USER_ID_ FROM ACT_HI_IDENTITYLINK LINK
+                    WHERE
+                    1=1
+                    <if test="null != userId and userId !='' ">
+                        AND USER_ID_ = #{userId}
+                    </if>
+                    AND LINK.PROC_INST_ID_ = RES.ID_
+                )
+            )
+            ORDER BY RES.ID_ ASC
+        ) t
+        INNER JOIN t_ops_bu_work_order p
+        ON t.proc_inst_id_=p.proc_inst_id
+        WHERE
+            1=1
+            <if test="null !=orderNo and orderNo!=''">
+                and p.order_no=#{orderNo}
+            </if>
+            <if test="null !=orderType">
+                and p.order_type=#{orderType}
+            </if>
+            <if test="null !=createdUserId">
+                and p.created_user_id=#{createdUserId}
+            </if>
+
+    </sql>
+-->
+
+
+    <sql id="WorkOrderProcessedSql">
+        (
+        SELECT DISTINCT RES.* , DEF.KEY_ AS PROC_DEF_KEY_, DEF.NAME_ AS PROC_DEF_NAME_, DEF.VERSION_ AS PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ AS DEPLOYMENT_ID_
+        FROM ACT_HI_PROCINST RES LEFT OUTER JOIN ACT_RE_PROCDEF DEF ON RES.PROC_DEF_ID_ = DEF.ID_ WHERE DEF.KEY_ = #{processDefineKey} AND RES.END_TIME_ IS NOT NULL AND
+        (
+        EXISTS
+        (
+        SELECT LINK.USER_ID_ FROM ACT_HI_IDENTITYLINK LINK
+        WHERE
+        1=1
+        <if test="null != userId and userId !='' ">
+            AND USER_ID_ = #{userId}
+        </if>
+        AND LINK.PROC_INST_ID_ = RES.ID_
+        )
+        )
+        ORDER BY RES.ID_ ASC
+        ) t
+
+    </sql>
+
+    <select id="countWorkOrderProcessed" resultType="long" parameterType="com.xhg.ops.workflow.dto.WorkOrderReqParam">
+      SELECT count(1) FROM
+      <include refid="WorkOrderProcessedSql"/>
+    </select>
+
+
+    <select id="listWorkOrderProcessed" resultMap="BaseResultMap" parameterType="com.xhg.ops.workflow.dto.WorkOrderReqParam">
+        SELECT p.* FROM
+        <include refid="WorkOrderProcessedSql"/>
+        limit #{startIndex},#{pageSize}
+    </select>
+
+<!--
+    <sql id="WorkOrderProcessingSql">
+        (
+            SELECT DISTINCT RES.* , DEF.KEY_ AS PROC_DEF_KEY_, DEF.NAME_ AS PROC_DEF_NAME_, DEF.VERSION_ AS PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ AS DEPLOYMENT_ID_
+            FROM ACT_HI_PROCINST RES LEFT OUTER JOIN ACT_RE_PROCDEF DEF ON RES.PROC_DEF_ID_ = DEF.ID_ WHERE DEF.KEY_ = #{processDefineKey} AND RES.END_TIME_ IS  NULL AND
+            (
+              EXISTS
+                (
+                    SELECT LINK.USER_ID_ FROM ACT_HI_IDENTITYLINK LINK
+                    WHERE
+                    1=1
+                    <if test="null != userId and userId !='' ">
+                        AND USER_ID_ = #{userId}
+                    </if>
+
+                    AND LINK.PROC_INST_ID_ = RES.ID_
+                )
+            )
+            ORDER BY RES.ID_ ASC
+        ) t
+        INNER JOIN t_ops_bu_work_order p
+        ON t.proc_inst_id_=p.proc_inst_id
+        WHERE
+        1=1
+        <if test="null !=orderNo and orderNo!=''">
+            and p.order_no=#{orderNo}
+        </if>
+        <if test="null !=orderType">
+            and p.order_type=#{orderType}
+        </if>
+        <if test="null !=createdUserId">
+            and p.created_user_id=#{createdUserId}
+        </if>
+
+    </sql>
+-->
+
+
+
+
+    <sql id="WorkOrderProcessingSql">
+        select res.PROC_INST_ID_,max(res.START_TIME_)
+        FROM act_hi_actinst res
+        where res.PROC_INST_ID_ in
+
+        (
+                    SELECT
+                      RES.PROC_INST_ID_
+                    FROM act_hi_actinst RES
+                    LEFT OUTER JOIN ACT_RE_PROCDEF DEF
+                      ON RES.PROC_DEF_ID_ = DEF.ID_
+                    WHERE
+                    1=1
+                    <if test="null != processDefineKey and processDefineKey !='' ">
+                        AND DEF.KEY_ = #{processDefineKey}
+                    </if>
+                    AND RES.END_TIME_ IS NOT NULL
+                    <if test="null != userId and userId !='' ">
+                        AND RES.ASSIGNEE_ = #{userId}
+                    </if>
+                    AND (
+                        EXISTS
+                        (
+                            SELECT
+                              LINK.USER_ID_
+                            FROM
+                              ACT_HI_IDENTITYLINK LINK
+                            WHERE
+                                1=1
+                                <if test="null != userId and userId !='' ">
+                                    AND USER_ID_ = #{userId}
+                                </if>
+                              AND LINK.PROC_INST_ID_ = RES.PROC_INST_ID_
+                      )
+                    )
+                    AND  EXISTS(
+                        SELECT * FROM act_ru_execution t
+                        WHERE t.PROC_INST_ID_ = res.PROC_INST_ID_
+                    )
+                    GROUP BY RES.PROC_INST_ID_
+        )
+        group by  res.PROC_INST_ID_
+        order by  max(res.START_TIME_) desc
+
+    </sql>
+
+
+
+    <select id="countWorkOrderProcessing" resultType="long" parameterType="com.xhg.ops.workflow.dto.WorkflowQueryReq">
+        SELECT count(1) FROM
+        (
+          <include refid="WorkOrderProcessingSql"/>
+        ) t
+    </select>
+
+
+    <select id="listWorkOrderProcessing" resultType="com.xhg.ops.workflow.dto.WorkflowQueryResp" parameterType="com.xhg.ops.workflow.dto.WorkflowQueryReq">
+        SELECT t.PROC_INST_ID_ AS processInstanceId  FROM
+        ( <include refid="WorkOrderProcessingSql"/> ) t
+        limit #{startIndex},#{pageSize}
+    </select>
+
+<!--
+    <sql id="WorkOrderProcessUndoSql">
+        (
+
+            SELECT res.id_ AS id,res.name_ AS NAME,res.proc_inst_id_ AS proc_inst_id
+            FROM ACT_RU_TASK RES
+            INNER JOIN ACT_RU_IDENTITYLINK I ON I.TASK_ID_ = RES.ID_
+            INNER JOIN ACT_RE_PROCDEF D ON RES.PROC_DEF_ID_ = D.ID_
+            WHERE D.KEY_ = #{processDefineKey} AND RES.ASSIGNEE_ IS NULL
+            AND I.TYPE_ = 'candidate'
+            AND (
+                1=0
+                <if test="null != userId and userId !='' ">
+                  OR I.USER_ID_ = #{userId}
+                </if>
+
+                <if test="null != roleIdList and roleIdList.size > 0">
+                    OR I.GROUP_ID_ IN
+                    <foreach collection="roleIdList" item="roleId" open="(" separator=", "  close=")">
+                        #{roleId}
+                    </foreach>
+                </if>
+
+
+          )
+
+        ) t
+        INNER JOIN t_ops_bu_work_order p
+        ON t.proc_inst_id=p.proc_inst_id
+        WHERE
+        1=1
+        <if test="null !=orderNo and orderNo!=''">
+            and p.order_no=#{orderNo}
+        </if>
+        <if test="null !=orderType">
+            and p.order_type=#{orderType}
+        </if>
+        <if test="null !=createdUserId">
+            and p.created_user_id=#{createdUserId}
+        </if>
+
+    </sql>
+-->
+
+
+    <sql id="WorkOrderProcessUndoSql">
+        (
+
+            SELECT res.id_ AS id,res.name_ AS NAME,res.proc_inst_id_ AS proc_inst_id
+            FROM ACT_RU_TASK RES
+            INNER JOIN ACT_RU_IDENTITYLINK I ON I.TASK_ID_ = RES.ID_
+            INNER JOIN ACT_RE_PROCDEF D ON RES.PROC_DEF_ID_ = D.ID_
+            WHERE
+                1=1
+                <if test="null != processDefineKey and processDefineKey !='' ">
+                    AND D.KEY_ = #{processDefineKey}
+                </if>
+                AND RES.ASSIGNEE_ IS NULL
+                AND I.TYPE_ = 'candidate'
+                AND (
+                    1=0
+                    <if test="null != userId and userId !='' ">
+                        OR I.USER_ID_ = #{userId}
+                    </if>
+
+                    <if test="null != roleIdList and roleIdList.size > 0">
+                        OR I.GROUP_ID_ IN
+                        <foreach collection="roleIdList" item="roleId" open="(" separator=", "  close=")">
+                            #{roleId}
+                        </foreach>
+                    </if>
+
+                )
+
+        ) t
+
+    </sql>
+
+    <select id="countWorkOrderProcessUndo" resultType="long" parameterType="com.xhg.ops.workflow.dto.WorkOrderReqParam">
+        SELECT count(1) FROM
+        <include refid="WorkOrderProcessUndoSql"/>
+    </select>
+
+
+    <select id="listWorkOrderProcessUndo" resultMap="BaseResultMap" parameterType="com.xhg.ops.workflow.dto.WorkOrderReqParam">
+        SELECT p.* FROM
+        <include refid="WorkOrderProcessUndoSql"/>
+        limit #{startIndex},#{pageSize}
+    </select>
+</mapper>

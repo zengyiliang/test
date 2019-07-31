@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.system.dao.SystemAreaZoneDao" >
+    <resultMap id="BaseResultMap" type="com.xhg.ops.system.model.SystemAreaZone" >
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+        <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+        <result column="enable" property="enable" jdbcType="BIT" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, name, code, created_user_id, updated_user_id, created_time, updated_time, enable
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Where_Clause">
+        where 1=1 and enable=1
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="createdUserId != null">
+                and created_user_id = #{createdUserId}
+            </if>
+            <if test="updatedUserId != null">
+                and updated_user_id = #{updatedUserId}
+            </if>
+
+        </trim>
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_ops_bu_system_area_zone
+        where id = #{id,jdbcType=INTEGER} and enable = 1
+    </select>
+
+    <select id="queryAllCount" resultType="java.lang.Integer" parameterType="com.xhg.ops.system.model.SystemAreaZone">
+        select COUNT(1)
+        from t_ops_bu_system_area_zone <include refid="Where_Clause"/>
+    </select>
+
+
+    <select id="queryAllList" resultMap="BaseResultMap" parameterType="com.xhg.ops.system.model.SystemAreaZone">
+        select <include refid="Base_Column_List"/>
+        from t_ops_bu_system_area_zone <include refid="Where_Clause"/>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+        delete from t_ops_bu_system_area_zone
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.xhg.ops.system.model.SystemAreaZone" >
+        insert into t_ops_bu_system_area_zone (id, name, code,
+        created_user_id, updated_user_id, created_time,
+        updated_time, enable)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},
+        #{createdUserId,jdbcType=INTEGER}, #{updatedUserId,jdbcType=INTEGER}, #{createdTime,jdbcType=TIMESTAMP},
+        #{updatedTime,jdbcType=TIMESTAMP}, #{enable,jdbcType=BIT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.xhg.ops.system.model.SystemAreaZone" >
+        insert into t_ops_bu_system_area_zone
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="code != null" >
+                code,
+            </if>
+            <if test="createdUserId != null" >
+                created_user_id,
+            </if>
+            <if test="updatedUserId != null" >
+                updated_user_id,
+            </if>
+            <if test="createdTime != null" >
+                created_time,
+            </if>
+            <if test="updatedTime != null" >
+                updated_time,
+            </if>
+            <if test="enable != null" >
+                enable,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null" >
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="createdUserId != null" >
+                #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="updatedUserId != null" >
+                #{updatedUserId,jdbcType=INTEGER},
+            </if>
+            <if test="createdTime != null" >
+                #{createdTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedTime != null" >
+                #{updatedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enable != null" >
+                #{enable,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.xhg.ops.system.model.SystemAreaZone" >
+        update t_ops_bu_system_area_zone
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null" >
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="createdUserId != null" >
+                created_user_id = #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="updatedUserId != null" >
+                updated_user_id = #{updatedUserId,jdbcType=INTEGER},
+            </if>
+            <if test="createdTime != null" >
+                created_time = #{createdTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedTime != null" >
+                updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enable != null" >
+                enable = #{enable,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xhg.ops.system.model.SystemAreaZone" >
+        update t_ops_bu_system_area_zone
+        set name = #{name,jdbcType=VARCHAR},
+        code = #{code,jdbcType=VARCHAR},
+        created_user_id = #{createdUserId,jdbcType=INTEGER},
+        updated_user_id = #{updatedUserId,jdbcType=INTEGER},
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+        enable = #{enable,jdbcType=BIT}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

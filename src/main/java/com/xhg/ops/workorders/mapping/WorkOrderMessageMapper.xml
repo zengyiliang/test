@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderMessageDao" >
+  <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrderMessage" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="receive_id" property="receiveId" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+  </resultMap>
+  
+  <!-- 查询接收人每组工单的最新消息 -->
+  <select id="queryNewestMessageList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    SELECT 
+	    id,
+	  	order_id,
+	  	title,
+	  	type,
+	  	content,
+	  	status,
+	  	receive_id,
+	  	created_time,
+	  	updated_time
+    FROM t_ops_bu_work_order_message 
+    WHERE id IN (
+    	SELECT MAX(id) FROM t_ops_bu_work_order_message WHERE receive_id = #{receiveId} AND type = #{type} GROUP BY order_id
+    ) ORDER BY status ASC, id DESC
+  </select>
+  
+  <!-- 新增消息记录 -->
+  <insert id="insert" parameterType="com.xhg.ops.workorders.model.WorkOrderMessage">
+    INSERT INTO t_ops_bu_work_order_message (
+    	order_id,
+    	title,
+    	type,
+    	content,
+    	status,
+    	receive_id,
+    	created_time,
+    	updated_time,
+    	created_user_id, 
+        updated_user_id,
+        enable
+    ) VALUES 
+    <foreach collection="list" item="item" index="index" separator="," >  
+        (
+	    #{item.orderId},
+	    #{item.title},
+    	#{item.type},
+        #{item.content},
+        #{item.status},
+        #{item.receiveId}, 
+        #{item.createdTime},
+        #{item.updatedTime},
+        #{item.createdUserId}, 
+        #{item.updatedUserId},
+        #{item.enable}
+        )  
+    </foreach>  
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="update" parameterType="com.xhg.ops.workorders.model.WorkOrderMessage">
+  	UPDATE t_ops_bu_work_order_message
+  	<set>
+  		updated_time = #{updatedTime},
+  		<if test="status != null">
+	  		status = #{status},
+  		</if>
+  		<if test="updatedUserId != null and updatedUserId != 0">
+			updated_user_id = #{updatedUserId},
+		</if>
+  	</set>
+  	<where>
+  		id = #{id}
+  	</where>
+  </update>
+    
+</mapper>

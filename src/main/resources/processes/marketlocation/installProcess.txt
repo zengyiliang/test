@@ -1,0 +1,2 @@
+installApply,设备安装申请
+installationManagerAudit,安装经理审核

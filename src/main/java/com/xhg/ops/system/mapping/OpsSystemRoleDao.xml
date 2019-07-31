@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xhg.ops.system.dao.OpsSystemRoleDao">
+	<!-- 根据id查询 ${codeName} -->
+	<select id="queryByRoleCode" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_role
+		where role_code=#{roleCode} and enable=1
+	</select>
+	<!-- 根据id查询 ${codeName} -->
+	<select id="queryMaxRoleCode" resultType="java.lang.String">
+		select MAX(role_code)
+		from t_ops_bu_system_role
+	</select>
+	<!-- 查询${codeName}列表 -->
+	<select id="queryRoleList" resultType="com.xhg.ops.system.entity.OpsSystemRoleDO"
+		parameterType="java.util.Map">
+		select
+		r.id, r.role_code roleCode, r.name, r.created_time createdTime
+		,u.name createdUserName
+		from t_ops_bu_system_role r left join
+		t_ops_bu_system_user u on u.id=r.created_user_id
+		<!-- 查询条件 -->
+
+		where
+		r.enable=1
+		<if test="userId != null and userId != ''">
+			and u.id = #{userId}
+		</if>
+		and u.enable=1
+	</select>
+
+</mapper>   

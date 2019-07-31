@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderDevicePartsDao" >
+  <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrderDeviceParts" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="module_id" property="moduleId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+  </resultMap>
+  
+  <!-- 新增 -->
+  <insert id="insert" parameterType="com.xhg.ops.workorders.model.WorkOrderDeviceParts" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    INSERT INTO t_ops_bu_work_order_device_parts (
+		id,
+		module_id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+    ) VALUES (
+        #{id,jdbcType=INTEGER},
+        #{moduleId,jdbcType=INTEGER},
+    	#{name,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR},
+        #{createdUserId,jdbcType=INTEGER},
+        #{updatedUserId,jdbcType=INTEGER},
+        #{createdTime,jdbcType=TIMESTAMP},
+        #{updatedTime,jdbcType=TIMESTAMP},
+        #{enable,jdbcType=BIT}
+       )  
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="update" parameterType="com.xhg.ops.workorders.model.WorkOrderDeviceParts">
+  	UPDATE t_ops_bu_work_order_device_parts
+  	<set>
+  		updated_time = #{updatedTime},
+  		<if test="updatedUserId != null">
+  			updated_user_id = #{updatedUserId},
+  		</if>
+  		<if test="moduleId != null">
+  			module_id = #{moduleId},
+  		</if>
+  		<if test="name != null and name != ''">
+  			name = #{name},
+  		</if>
+  		<if test="remark != null and remark != ''">
+  			remark = #{remark},
+  		</if>
+  	</set>
+  	<where>
+  		id = #{id}
+  	</where>
+  </update>
+  
+  <!-- 更新附件信息无效 -->
+  <delete id="delete" parameterType="java.lang.Integer" >
+    UPDATE t_ops_bu_work_order_device_parts SET enable = 0, updated_time=SYSDATE(), updated_user_id = #{updatedUserId} WHERE id = #{id}
+  </delete>
+  
+  <!-- 查询单个 -->
+  <select id="findOne" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	SELECT 
+  		id,
+  		module_id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+	FROM t_ops_bu_work_order_device_parts WHERE id = #{id}
+  </select>
+  
+  <!-- 获取列表 -->
+  <select id="findDevicePartsListByModuleId" resultMap="BaseResultMap">
+  	SELECT 
+  		id,
+  		module_id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+	FROM t_ops_bu_work_order_device_parts WHERE enable = 1 AND module_id = #{moduleId}
+  </select>
+  
+    <!-- 获取列表 -->
+  <select id="findAllDevicePartsList" resultMap="BaseResultMap">
+  	SELECT 
+  		id,
+  		module_id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+	FROM t_ops_bu_work_order_device_parts WHERE enable = 1
+  </select>
+  
+  <!-- 获取对象列表 -->
+  <select id="findDeviceModuleDtoListByModuleId" resultType="com.xhg.ops.workorders.dto.WorkOrderDevicePartsDto">
+  	SELECT 
+  		t1.id,
+		t1.name,
+		t1.remark,
+        DATE_FORMAT(t1.created_time,'%Y-%m-%d %T') createdTime,
+        t2.name moduleName,
+        t3.name createdUserName
+	FROM t_ops_bu_work_order_device_parts t1 
+	LEFT JOIN t_ops_bu_work_order_device_module t2 ON t1.module_id = t2.id and t2.enable = 1
+	LEFT JOIN t_ops_bu_system_user t3 ON t1.created_user_id = t3.id
+	WHERE t1.enable = 1
+  </select>
+  
+</mapper>

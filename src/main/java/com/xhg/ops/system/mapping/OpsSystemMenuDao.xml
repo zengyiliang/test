@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xhg.ops.system.dao.OpsSystemMenuDao">
+	<!-- 根据url模糊查询 ${codeName} -->
+	<select id="queryByUrl" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu
+		where url=#{url} and enable=1
+	</select>
+	<!-- 查询${codeName}列表 -->
+	<select id="queryMenuList" resultType="com.xhg.ops.system.entity.OpsSystemMenuDO"
+		parameterType="java.util.Map">
+		select
+		m.id, m.name, m.code, m.parent_id parentId, m.permission, m.url,
+		m.type,
+		m.sequence, m.icon, m.created_user_id createdUserId,
+		m.updated_user_id updatedUserId,
+		m.created_time, m.updated_time,
+		m.enable
+		,u.name createdUserName
+		from t_ops_bu_system_menu m left join
+		t_ops_bu_system_user u on u.id=m.created_user_id
+		<!-- 查询条件 -->
+
+		where
+		m.enable=1 and u.enable=1
+		<if test="id != null">
+			and m.id = #{id}
+		</if>
+		<if test="name != null and name != ''">
+			and m.name = #{name}
+		</if>
+		<if test="code != null and code != ''">
+			and m.code = #{code}
+		</if>
+		<if test="parentId != null">
+			and m.parent_id = #{parentId}
+		</if>
+		<if test="permission != null and permission != ''">
+			and m.permission = #{permission}
+		</if>
+		<if test="url != null and url != ''">
+			and m.url = #{url}
+		</if>
+		<if test="type != null">
+			and m.type = #{type}
+		</if>
+		<if test="sequence != null">
+			and m.sequence = #{sequence}
+		</if>
+		<if test="icon != null and icon != ''">
+			and m.icon = #{icon}
+		</if>
+		<if test="createdUserId != null">
+			and m.created_user_id = #{createdUserId}
+		</if>
+		<if test="updatedUserId != null">
+			and m.updated_user_id = #{updatedUserId}
+		</if>
+		<if test="createdTime != null">
+			and m.created_time = #{createdTime}
+		</if>
+		<if test="updatedTime != null">
+			and m.updated_time = #{updatedTime}
+		</if>
+		<if test="enable != null">
+			and m.enable = #{enable}
+		</if>
+
+	</select>
+	<resultMap id="BaseResultMenusMap" type="com.xhg.ops.system.entity.OpsSystemMenuDO">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="code" property="code" />
+		<result column="parent_id" property="parentId" />
+		<result column="permission" property="permission" />
+		<result column="url" property="url" />
+		<result column="type" property="type" />
+		<result column="sequence" property="sequence" />
+		<result column="icon" property="icon" />
+		<result column="created_user_id" property="createdUserId" />
+		<result column="updated_user_id" property="updatedUserId" />
+		<result column="created_time" property="createdTime" />
+		<result column="updated_time" property="updatedTime" />
+		<result column="enable" property="enable" />
+		<collection property="menus"
+			ofType="com.xhg.ops.system.entity.OpsSystemMenuDO" column="id"
+			select="findMenuByParentId" />
+	</resultMap>
+	<!-- 查询${codeName}列表 -->
+	<select id="queryAllListMenus" resultMap="BaseResultMenusMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu
+		WHERE parent_id =0 and enable=1 ORDER BY
+		sequence ASC
+	</select>
+	<!-- 查询一二级菜单列表 -->
+	<select id="queryAllSuperiorMenus" resultMap="BaseResultMenusMap" >
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		t_ops_bu_system_menu
+		WHERE
+		( parent_id = 0 OR parent_id IN ( SELECT id FROM t_ops_bu_system_menu
+		WHERE parent_id = 0 AND ENABLE = 1 ) )
+		AND ENABLE = 1
+		ORDER BY
+		sequence ASC
+	</select>
+
+	<select id="findMenuByParentId" resultMap="BaseResultMenusMap"
+		parameterType="int">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu WHERE parent_id = #{id} and enable=1 ORDER
+		BY sequence ASC
+	</select>
+	<resultMap id="BaseResultTwoMenusMap" type="com.xhg.ops.system.entity.OpsSystemMenuDO">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="code" property="code" />
+		<result column="parent_id" property="parentId" />
+		<result column="permission" property="permission" />
+		<result column="url" property="url" />
+		<result column="type" property="type" />
+		<result column="sequence" property="sequence" />
+		<result column="icon" property="icon" />
+		<result column="created_user_id" property="createdUserId" />
+		<result column="updated_user_id" property="updatedUserId" />
+		<result column="created_time" property="createdTime" />
+		<result column="updated_time" property="updatedTime" />
+		<result column="enable" property="enable" />
+		<collection property="menus"
+			ofType="com.xhg.ops.system.entity.OpsSystemMenuDO" column="id"
+			select="findTwoMenuByParentId" />
+	</resultMap>
+	<select id="queryAllListTwoMenus" resultMap="BaseResultTwoMenusMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu
+		WHERE parent_id =0 and enable=1 ORDER BY
+		sequence ASC
+	</select>
+	
+		<select id="findTwoMenuByParentId" resultMap="BaseResultTwoMenusMap"
+		parameterType="int">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu WHERE  parent_id IN ( SELECT id FROM t_ops_bu_system_menu
+		WHERE parent_id = 0 AND ENABLE = 1 )and  parent_id = #{id} and enable=1 ORDER
+		BY sequence ASC
+	</select>
+	<resultMap id="BaseResultTwoFollowingMenusMap" type="com.xhg.ops.system.entity.OpsSystemMenuDO">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="code" property="code" />
+		<result column="parent_id" property="parentId" />
+		<result column="permission" property="permission" />
+		<result column="url" property="url" />
+		<result column="type" property="type" />
+		<result column="sequence" property="sequence" />
+		<result column="icon" property="icon" />
+		<result column="created_user_id" property="createdUserId" />
+		<result column="updated_user_id" property="updatedUserId" />
+		<result column="created_time" property="createdTime" />
+		<result column="updated_time" property="updatedTime" />
+		<result column="enable" property="enable" />
+		<collection property="menus"
+			ofType="com.xhg.ops.system.entity.OpsSystemMenuDO" column="id"
+			select="findTwoFollowingMenuByParentId" />
+	</resultMap>
+	<select id="queryUserTwoFollowingPrevilege" resultMap="BaseResultTwoFollowingMenusMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu
+		WHERE parent_id IN ( SELECT id FROM t_ops_bu_system_menu
+		WHERE parent_id = 0 AND ENABLE = 1 ) and enable=1 ORDER BY
+		sequence ASC
+	</select>
+	
+		<select id="findTwoFollowingMenuByParentId" resultMap="BaseResultTwoFollowingMenusMap"
+		parameterType="int">
+		select
+		<include refid="Base_Column_List" />
+		from t_ops_bu_system_menu WHERE    parent_id = #{id} and enable=1 ORDER
+		BY sequence ASC
+	</select>
+</mapper>   

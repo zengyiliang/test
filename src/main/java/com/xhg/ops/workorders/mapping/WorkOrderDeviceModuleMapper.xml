@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderDeviceModuleDao" >
+  <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrderDeviceModule" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+  </resultMap>
+  
+  <!-- 新增 -->
+  <insert id="insert" parameterType="com.xhg.ops.workorders.model.WorkOrderDeviceModule" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    INSERT INTO t_ops_bu_work_order_device_module (
+		id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+    ) VALUES (
+        #{id,jdbcType=INTEGER},
+    	#{name,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR},
+        #{createdUserId,jdbcType=INTEGER},
+        #{updatedUserId,jdbcType=INTEGER},
+        #{createdTime,jdbcType=TIMESTAMP},
+        #{updatedTime,jdbcType=TIMESTAMP},
+        #{enable,jdbcType=BIT}
+       )  
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="update" parameterType="com.xhg.ops.workorders.model.WorkOrderDeviceModule">
+  	UPDATE t_ops_bu_work_order_device_module
+  	<set>
+  		updated_time = #{updatedTime},
+  		<if test="updatedUserId != null">
+  			updated_user_id = #{updatedUserId},
+  		</if>
+  		<if test="name != null and name != ''">
+  			name = #{name},
+  		</if>
+  		<if test="remark != null and remark != ''">
+  			remark = #{remark},
+  		</if>
+  	</set>
+  	<where>
+  		id = #{id}
+  	</where>
+  </update>
+  
+  <!-- 更新附件信息无效 -->
+  <delete id="delete" parameterType="java.lang.Integer" >
+    UPDATE t_ops_bu_work_order_device_module SET enable = 0, updated_time=SYSDATE(), updated_user_id = #{updatedUserId} WHERE id = #{id}
+  </delete>
+  
+  <!-- 查询单个 -->
+  <select id="findOne" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	SELECT 
+  		id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+	FROM t_ops_bu_work_order_device_module WHERE id = #{id}
+  </select>
+  
+  <!-- 获取列表 -->
+  <select id="findDeviceModuleList" resultMap="BaseResultMap">
+  	SELECT 
+  		id,
+		name,
+		remark,
+		created_user_id,
+		updated_user_id, 
+        created_time,
+        updated_time,
+        enable
+	FROM t_ops_bu_work_order_device_module WHERE enable = 1
+  </select>
+  
+  <!-- 获取对象列表 -->
+  <select id="findDeviceModuleDtoList" resultType="com.xhg.ops.workorders.dto.WorkOrderDeviceModuleDto">
+  	SELECT 
+  		t1.id,
+		t1.name,
+		t1.remark,
+        DATE_FORMAT(t1.created_time, '%Y-%m-%d %T') createdTime,
+        t2.name createdUserName
+    FROM t_ops_bu_work_order_device_module t1
+    LEFT JOIN t_ops_bu_system_user t2 ON t1.created_user_id = t2.id
+	WHERE t1.enable = 1
+  </select>
+  
+</mapper>

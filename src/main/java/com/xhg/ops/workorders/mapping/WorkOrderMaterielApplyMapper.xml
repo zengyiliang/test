@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xhg.ops.workorders.dao.WorkOrderMaterielApplyDao" >
+
+  <resultMap id="BaseResultMap" type="com.xhg.ops.workorders.model.WorkOrderMaterielApply" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="module_id" property="moduleId" jdbcType="INTEGER" />
+    <result column="module_name" property="moduleName" jdbcType="VARCHAR" />
+    <result column="materiel_no" property="materielNo" jdbcType="VARCHAR" />
+    <result column="materiel_name" property="materielName" jdbcType="VARCHAR" />
+    <result column="receive_person" property="receivePerson" jdbcType="VARCHAR" />
+    <result column="receive_phone" property="receivePhone" jdbcType="VARCHAR" />
+    <result column="receive_province_code" property="receiveProvinceCode" jdbcType="VARCHAR" />
+    <result column="receive_city_code" property="receiveCityCode" jdbcType="VARCHAR" />
+    <result column="receive_district_code" property="receiveDistrictCode" jdbcType="VARCHAR" />
+    <result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="updated_user_id" property="updatedUserId" jdbcType="INTEGER" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+  </resultMap>
+  
+  <!-- 查询单个 -->
+  <select id="queryWorkOrderMaterielList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    SELECT 
+    	id, 
+    	order_id,
+    	module_id,
+    	module_name,
+    	materiel_no, 
+    	materiel_name, 
+    	receive_person, 
+    	receive_phone, 
+    	receive_province_code, 
+    	receive_city_code, 
+    	receive_district_code, 
+    	receive_address, 
+    	remark, 
+    	created_time, 
+    	updated_time, 
+    	created_user_id, 
+    	updated_user_id, 
+    	enable
+    FROM t_ops_bu_work_order_materiel_apply
+    WHERE enable = 1 AND order_id = #{orderId} ORDER BY id DESC
+  </select>
+  
+  <!-- 查询数量 -->
+  <select id="countByOrderId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(id)
+    FROM t_ops_bu_work_order_materiel_apply
+    WHERE enable = 1 AND order_id = #{orderId}
+  </select>
+ 
+  <!-- 新增 -->
+  <insert id="insert" parameterType="com.xhg.ops.workorders.model.WorkOrderMaterielApply" >
+	INSERT INTO t_ops_bu_work_order_materiel_apply (
+		id, 
+		order_id, 
+		module_id,
+    	module_name,
+		materiel_no, 
+		materiel_name, 
+		receive_person, 
+		receive_phone, 
+		receive_province_code, 
+		receive_city_code, 
+		receive_district_code, 
+		receive_address, 
+		remark, 
+		created_time, 
+		updated_time, 
+		created_user_id, 
+		updated_user_id, 
+		enable
+	) values (
+		#{id,jdbcType=INTEGER}, 
+		#{orderId,jdbcType=INTEGER}, 
+		#{moduleId,jdbcType=INTEGER},
+		#{moduleName,jdbcType=VARCHAR},  
+		#{materielNo,jdbcType=VARCHAR}, 
+		#{materielName,jdbcType=VARCHAR}, 
+		#{receivePerson,jdbcType=VARCHAR}, 
+		#{receivePhone,jdbcType=VARCHAR}, 
+		#{receiveProvinceCode,jdbcType=VARCHAR}, 
+		#{receiveCityCode,jdbcType=VARCHAR}, 
+		#{receiveDistrictCode,jdbcType=VARCHAR}, 
+		#{receiveAddress,jdbcType=VARCHAR}, 
+		#{remark,jdbcType=VARCHAR}, 
+		#{createdTime,jdbcType=TIMESTAMP}, 
+		#{updatedTime,jdbcType=TIMESTAMP}, 
+		#{createdUserId,jdbcType=INTEGER}, 
+		#{updatedUserId,jdbcType=INTEGER}, 
+		#{enable,jdbcType=BIT}
+	)
+  </insert>
+</mapper>
